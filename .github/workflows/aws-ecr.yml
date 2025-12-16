@@ -1,0 +1,64 @@
+name: Publish Image in AWS ECR
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment: pro
+    env:
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+
+    steps:
+      - name: Checkout current repo (full history)
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Checkout belat-env-setup repo
+        uses: actions/checkout@v3
+        with:
+          repository: Fundacion-Dinero-Conciencia/belat-env-setup
+          path: belat-env-setup
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+
+      - name: Log in to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Extract branch name
+        id: extract_branch
+        run: |
+          branch="${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}"
+          branch="${branch//\//-}"
+          branch=$(echo "$branch" | tr '[:upper:]' '[:lower:]')
+          echo "branch=$branch" >> $GITHUB_OUTPUT
+
+      - name: Get Git Hashes
+        id: git_hashes
+        run: |
+          echo "short_hash=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+          echo "long_hash=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Build and Push Docker Image (single-arch)
+        run: |
+          IMAGE_URI="${{ steps.login-ecr.outputs.registry }}/${ECR_REPOSITORY}"
+          TAG="${{ steps.extract_branch.outputs.branch }}-${GITHUB_RUN_NUMBER}"
+    
+          docker build \
+            --build-arg="PUPPETEER_SKIP_DOWNLOAD_ARG=true" \
+            --build-arg="APIM_VERSION=4.3.2" \
+            -t $IMAGE_URI:$TAG .
+    
+          docker push $IMAGE_URI:$TAG
