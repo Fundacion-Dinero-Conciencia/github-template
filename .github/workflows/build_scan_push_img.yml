@@ -26,13 +26,6 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.AWS_REGION }}
 
-      - name: Checkout belat-env-setup repo
-        uses: actions/checkout@v3
-        with:
-          repository: Fundacion-Dinero-Conciencia/belat-env-setup
-          path: belat-env-setup
-          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
-
       - name: Log in to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
