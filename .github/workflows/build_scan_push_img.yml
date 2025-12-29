@@ -3,15 +3,43 @@ name: Publish Image in AWS ECR
 on:
   push:
     branches: [main]
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+    secrets:
+      AWS_REGION:
+        required: true
+      AWS_ACCOUNT_ID:
+        required: true
+      ECR_REPOSITORY:
+        required: true
+      CONTAINER_NAME:
+        required: true
+      ECS_SERVICE:
+        required: true
+      ECS_CLUSTER:
+        required: true
+      ECS_TASK_DEFINITION:
+        required: true
+      AWS_ACCESS_KEY_ID:
+        required: true
+      AWS_SECRET_ACCESS_KEY:
+        required: true
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    environment: pro
+    environment: ${{ inputs.environment }}
     env:
       AWS_REGION: ${{ secrets.AWS_REGION }}
       AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
       ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+      CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
+      ECS_SERVICE: ${{ secrets.ECS_SERVICE }}
+      ECS_CLUSTER: ${{ secrets.ECS_CLUSTER }}
+      ECS_TASK_DEFINITION: ${{ secrets.ECS_TASK_DEFINITION }}
 
     steps:
       - name: Checkout current repo (full history)
@@ -82,3 +110,23 @@ jobs:
           IMAGE_URI="${{ steps.build-image.outputs.image_uri }}"
           TAG="${{ steps.build-image.outputs.tag }}"
           docker push $IMAGE_URI:$TAG
+
+      - name: Download task definition
+        run: |
+          aws ecs describe-task-definition --task-definition ${{ secrets.ECS_TASK_DEFINITION }} --query taskDefinition > task-definition.json
+
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: ${{ secrets.CONTAINER_NAME }}
+          image: ${{ steps.build-image.outputs.image_uri }}:${{ steps.build-image.outputs.tag }}
+
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{ secrets.ECS_SERVICE }}
+          cluster: ${{ secrets.ECS_CLUSTER }}
+          wait-for-service-stability: true
