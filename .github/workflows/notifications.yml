@@ -19,15 +19,20 @@ jobs:
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
       GOOGLE_CHAT_WEBHOOK_URL: ${{ secrets.GOOGLE_CHAT_WEBHOOK_URL }}
     steps:
+      - name: Debug Secrets
+        run: |
+          echo "Checking for secrets..."
+          if [ -n "${{ env.SLACK_WEBHOOK_URL }}" ]; then echo "Slack secret is DETECTED"; else echo "Slack secret is EMPTY"; fi
+          if [ -n "${{ env.GOOGLE_CHAT_WEBHOOK_URL }}" ]; then echo "Google Chat secret is DETECTED"; else echo "Google Chat secret is EMPTY"; fi
       - name: Send Slack Notification
-        if: env.SLACK_WEBHOOK_URL != ''
+        if: ${{ env.SLACK_WEBHOOK_URL != '' }}
         run: |
           curl -X POST -H 'Content-type: application/json' \
           --data '{"text": "GITHUB ACTION STATUS: ${{ inputs.job_status }} - Workflow: ${{ github.workflow }} - Repo: ${{ github.repository }}"}' \
           ${{ secrets.SLACK_WEBHOOK_URL }}
 
       - name: Send Google Chat Notification
-        if: env.GOOGLE_CHAT_WEBHOOK_URL != ''
+        if: ${{ env.GOOGLE_CHAT_WEBHOOK_URL != '' }}
         run: |
           curl -X POST -H 'Content-Type: application/json' \
           --data '{"text": "GITHUB ACTION STATUS: ${{ inputs.job_status }} - Workflow: ${{ github.workflow }} - Repo: ${{ github.repository }}"}' \
