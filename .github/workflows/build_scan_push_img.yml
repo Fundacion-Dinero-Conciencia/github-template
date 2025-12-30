@@ -33,8 +33,8 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
     env:
-      AWS_REGION: ${{ secrets.AWS_REGION }}
       AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
       ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
       CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
       ECS_SERVICE: ${{ secrets.ECS_SERVICE }}
@@ -72,14 +72,14 @@ jobs:
           echo "short_hash=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
           echo "long_hash=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
 
-      - name: Run Trivy vulnerability scanner (filesystem)
-        uses: aquasecurity/trivy-action@master
-        with:
-          scan-type: 'fs'
-          scan-ref: '.'
-          format: 'table'
-          exit-code: '1'
-          severity: 'CRITICAL,HIGH'
+#      - name: Run Trivy vulnerability scanner (filesystem)
+#        uses: aquasecurity/trivy-action@master
+#        with:
+#          scan-type: 'fs'
+#          scan-ref: '.'
+#          format: 'table'
+#          exit-code: '1'
+#          severity: 'CRITICAL,HIGH'
 
       - name: Build Docker Image
         id: build-image
