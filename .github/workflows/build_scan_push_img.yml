@@ -51,6 +51,12 @@ jobs:
         with:
           fetch-depth: 0
 
+
+      - name: Install wkhtmltopdf
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wkhtmltopdf
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
@@ -76,14 +82,23 @@ jobs:
           echo "short_hash=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
           echo "long_hash=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
 
-#      - name: Run Trivy vulnerability scanner (filesystem)
-#        uses: aquasecurity/trivy-action@master
-#        with:
-#          scan-type: 'fs'
-#          scan-ref: '.'
-#          format: 'table'
-#          exit-code: '1'
-#          severity: 'CRITICAL,HIGH'
+      - name: Run Trivy vulnerability scanner (filesystem)
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'template'
+          template: '@/contrib/html.tpl'
+          output: 'trivy-fs-report.html'
+          exit-code: '1'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Convert FS Report to PDF
+        if: always()
+        run: |
+          if [ -f trivy-fs-report.html ]; then
+            wkhtmltopdf trivy-fs-report.html trivy-fs-report.pdf
+          fi
 
       - name: Build Docker Image
         id: build-image
@@ -99,15 +114,24 @@ jobs:
           echo "image_uri=$IMAGE_URI" >> $GITHUB_OUTPUT
           echo "tag=$TAG" >> $GITHUB_OUTPUT
 
-#      - name: Run Trivy vulnerability scanner
-#        uses: aquasecurity/trivy-action@master
-#        with:
-#          image-ref: '${{ steps.build-image.outputs.image_uri }}:${{ steps.build-image.outputs.tag }}'
-#          format: 'table'
-#          exit-code: '1'
-#          ignore-unfixed: true
-#          vuln-type: 'os,library'
-#          severity: 'CRITICAL,HIGH'
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: '${{ steps.build-image.outputs.image_uri }}:${{ steps.build-image.outputs.tag }}'
+          format: 'template'
+          template: '@/contrib/html.tpl'
+          output: 'trivy-image-report.html'
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: 'os,library'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Convert Image Report to PDF
+        if: always()
+        run: |
+          if [ -f trivy-image-report.html ]; then
+            wkhtmltopdf trivy-image-report.html trivy-image-report.pdf
+          fi
 
       - name: Push Docker Image
         run: |
@@ -134,6 +158,13 @@ jobs:
           service: ${{ secrets.ECS_SERVICE }}
           cluster: ${{ secrets.ECS_CLUSTER }}
           wait-for-service-stability: true
+
+      - name: Upload Trivy Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-reports
+          path: '*.pdf'
 
   notify:
     needs: [build]
