@@ -60,10 +60,10 @@ jobs:
 
 ```mermaid
 graph TD
-    Start[Inicio] --> SAST{Escaneo SAST<br/>(Trivy fs)}
+    Start[Inicio] --> SAST{"Escaneo SAST<br/>(Trivy fs)"}
     SAST -- Fallo --> Fail[Fallo del Workflow]
     SAST -- Éxito --> Build[Construir Imagen Docker]
-    Build --> Scan{Escaneo de Imagen<br/>(Trivy image)}
+    Build --> Scan{"Escaneo de Imagen<br/>(Trivy image)"}
     Scan -- Fallo --> Fail
     Scan -- Éxito --> Push[Push a AWS ECR]
     Push --> TaskDef[Descargar Task Definition]
