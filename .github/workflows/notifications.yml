@@ -1,0 +1,34 @@
+name: Notifications
+
+on:
+  workflow_call:
+    inputs:
+      job_status:
+        required: true
+        type: string
+    secrets:
+      SLACK_WEBHOOK_URL:
+        required: false
+      GOOGLE_CHAT_WEBHOOK_URL:
+        required: false
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    env:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      GOOGLE_CHAT_WEBHOOK_URL: ${{ secrets.GOOGLE_CHAT_WEBHOOK_URL }}
+    steps:
+      - name: Send Slack Notification
+        if: env.SLACK_WEBHOOK_URL != ''
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+          --data '{"text": "GITHUB ACTION STATUS: ${{ inputs.job_status }} - Workflow: ${{ github.workflow }} - Repo: ${{ github.repository }}"}' \
+          ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Send Google Chat Notification
+        if: env.GOOGLE_CHAT_WEBHOOK_URL != ''
+        run: |
+          curl -X POST -H 'Content-Type: application/json' \
+          --data '{"text": "GITHUB ACTION STATUS: ${{ inputs.job_status }} - Workflow: ${{ github.workflow }} - Repo: ${{ github.repository }}"}' \
+          ${{ secrets.GOOGLE_CHAT_WEBHOOK_URL }}

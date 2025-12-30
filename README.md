@@ -11,6 +11,7 @@ Este workflow automatiza las siguientes tareas de CI/CD:
 3.  **Escaneo de Imagen**: Escanea la imagen construida en busca de vulnerabilidades de sistema operativo y librerías utilizando **Trivy**.
 4.  **Publicación (Push)**: Sube la imagen a Amazon Elastic Container Registry (ECR).
 5.  **Despliegue (Deploy)**: Actualiza la definición de tarea de Amazon ECS y despliega el servicio.
+6.  **Notificaciones**: Envía el estado del workflow a Slack y Google Chat.
 
 ## 📋 Requisitos Previos
 
@@ -27,6 +28,8 @@ Para utilizar este flujo de trabajo, debes configurar los siguientes **Secretos*
 | `ECS_SERVICE` | Nombre del servicio ECS a actualizar. |
 | `ECS_CLUSTER` | Nombre del clúster ECS. |
 | `ECS_TASK_DEFINITION` | Nombre de la familia de la Task Definition o ARN. |
+| `SLACK_WEBHOOK_URL` | (Opcional) Webhook para notificaciones en Slack. |
+| `GOOGLE_CHAT_WEBHOOK_URL` | (Opcional) Webhook para notificaciones en Google Chat. |
 
 ## 🛠️ Uso
 
@@ -54,6 +57,8 @@ jobs:
       ECS_SERVICE: ${{ secrets.ECS_SERVICE }}
       ECS_CLUSTER: ${{ secrets.ECS_CLUSTER }}
       ECS_TASK_DEFINITION: ${{ secrets.ECS_TASK_DEFINITION }}
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      GOOGLE_CHAT_WEBHOOK_URL: ${{ secrets.GOOGLE_CHAT_WEBHOOK_URL }}
 ```
 
 ## 🔄 Diagrama del Flujo
@@ -69,7 +74,8 @@ graph TD
     Push --> TaskDef[Descargar Task Definition]
     TaskDef --> Render[Actualizar ID de Imagen]
     Render --> Deploy[Desplegar a Amazon ECS]
-    Deploy --> End[Fin]
+    Deploy --> Notify{Notificaciones<br/>(Slack/G-Chat)}
+    Notify --> End[Fin]
     
     style Start fill:#f9f,stroke:#333,stroke-width:2px
     style End fill:#f9f,stroke:#333,stroke-width:2px

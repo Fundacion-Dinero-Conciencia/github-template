@@ -27,6 +27,10 @@ on:
         required: true
       AWS_SECRET_ACCESS_KEY:
         required: true
+      SLACK_WEBHOOK_URL:
+        required: false
+      GOOGLE_CHAT_WEBHOOK_URL:
+        required: false
 
 jobs:
   build:
@@ -130,3 +134,13 @@ jobs:
           service: ${{ secrets.ECS_SERVICE }}
           cluster: ${{ secrets.ECS_CLUSTER }}
           wait-for-service-stability: true
+
+  notify:
+    needs: [build]
+    if: always()
+    uses: ./.github/workflows/notifications.yml
+    with:
+      job_status: ${{ needs.build.result }}
+    secrets:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      GOOGLE_CHAT_WEBHOOK_URL: ${{ secrets.GOOGLE_CHAT_WEBHOOK_URL }}
