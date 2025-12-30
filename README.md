@@ -43,7 +43,7 @@ jobs:
   deploy:
     uses: ./.github/workflows/build_scan_push_img.yml
     with:
-      environment: production
+      environment: pro
     secrets:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
