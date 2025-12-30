@@ -74,7 +74,7 @@ graph TD
     Push --> TaskDef[Descargar Task Definition]
     TaskDef --> Render[Actualizar ID de Imagen]
     Render --> Deploy[Desplegar a Amazon ECS]
-    Deploy --> Notify{Notificaciones<br/>(Slack/G-Chat)}
+    Deploy --> Notify{"Notificaciones<br/>(Slack/G-Chat)"}
     Notify --> End[Fin]
     
     style Start fill:#f9f,stroke:#333,stroke-width:2px
