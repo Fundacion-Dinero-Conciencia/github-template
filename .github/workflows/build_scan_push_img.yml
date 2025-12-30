@@ -141,6 +141,4 @@ jobs:
     uses: ./.github/workflows/notifications.yml
     with:
       job_status: ${{ needs.build.result }}
-    secrets:
-      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-      GOOGLE_CHAT_WEBHOOK_URL: ${{ secrets.GOOGLE_CHAT_WEBHOOK_URL }}
+    secrets: inherit
