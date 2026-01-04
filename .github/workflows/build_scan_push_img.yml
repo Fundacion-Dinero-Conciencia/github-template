@@ -3,6 +3,12 @@ name: Publish Image in AWS ECR
 on:
   push:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy'
+        required: true
+        type: string
   workflow_call:
     inputs:
       environment:
