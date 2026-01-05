@@ -36,20 +36,19 @@ Para utilizar este flujo de trabajo, debes configurar los siguientes **Secretos*
 Puedes invocar este workflow desde otro workflow en tu repositorio usando `workflow_call`:
 
 ```yaml
-name: Deploy to Production
+name: Deploy AWS 
 
 on:
   push:
     branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
   deploy:
-    uses: ./.github/workflows/build_scan_push_img.yml
+    uses: Fundacion-Dinero-Conciencia/github-template/.github/workflows/build_scan_push_img.yml@v9
     with:
       environment: pro
     secrets:
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       AWS_REGION: ${{ secrets.AWS_REGION }}
       AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
       ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
@@ -57,6 +56,8 @@ jobs:
       ECS_SERVICE: ${{ secrets.ECS_SERVICE }}
       ECS_CLUSTER: ${{ secrets.ECS_CLUSTER }}
       ECS_TASK_DEFINITION: ${{ secrets.ECS_TASK_DEFINITION }}
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
       GOOGLE_CHAT_WEBHOOK_URL: ${{ secrets.GOOGLE_CHAT_WEBHOOK_URL }}
 ```
