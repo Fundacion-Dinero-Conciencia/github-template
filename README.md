@@ -62,7 +62,35 @@ jobs:
       GOOGLE_CHAT_WEBHOOK_URL: ${{ secrets.GOOGLE_CHAT_WEBHOOK_URL }}
 ```
 
-## 🔄 Diagrama del Flujo
+## � Workflow de Actualización de Imagen en Otro Repositorio
+
+Este repositorio también incluye un workflow adicional (`.github/workflows/upload_image_name.yml`) que se activa automáticamente después de que el workflow principal termine exitosamente. Este workflow actualiza el archivo `task.auto.tfvars` en el repositorio `Fundacion-Dinero-Conciencia/infra-live` con el nombre de la nueva imagen Docker construida.
+
+### Funcionalidad
+- Descarga el artifact con el nombre de la imagen del workflow principal.
+- Clona el repositorio `Fundacion-Dinero-Conciencia/infra-live`.
+- Reemplaza la línea `image = "..."` en `aws-org-belat/environments/cuenta-pro/task.auto.tfvars` con el nuevo nombre de la imagen.
+- Hace commit y push de los cambios.
+
+### Requisitos Previos
+Para que este workflow funcione, necesitas:
+
+1. **Crear un Personal Access Token (PAT)** en GitHub:
+   - Ve a [GitHub Settings > Developer settings > Personal access tokens](https://github.com/settings/tokens).
+   - Crea un nuevo token con los siguientes scopes: `repo` (para acceso completo a repositorios privados).
+   - Copia el token generado.
+
+2. **Configurar el Secreto en este repositorio**:
+   - Ve a Settings > Secrets and variables > Actions.
+   - Agrega un nuevo secreto llamado `OTHER_REPO_TOKEN` con el valor del PAT creado.
+
+3. **Asegurar que el archivo exista**: El archivo `aws-org-belat/environments/cuenta-pro/task.auto.tfvars` debe existir en el repositorio `Fundacion-Dinero-Conciencia/infra-live` y contener una línea como `image = "valor-actual"`.
+
+### Notas
+- Este workflow solo se ejecuta si el workflow principal (`Publish Image in AWS ECR`) termina con éxito.
+- Si hay errores (por ejemplo, archivo no encontrado o permisos insuficientes), revisa los logs del workflow.
+
+## �🔄 Diagrama del Flujo
 
 ```mermaid
 graph TD

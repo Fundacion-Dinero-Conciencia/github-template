@@ -148,6 +148,16 @@ jobs:
           TAG="${{ steps.build-image.outputs.tag }}"
           docker push $IMAGE_URI:$TAG
 
+      - name: Create image name file
+        run: |
+          echo "${{ steps.build-image.outputs.image_uri }}:${{ steps.build-image.outputs.tag }}" > image_name.txt
+
+      - name: Upload image name artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: image-name
+          path: image_name.txt
+
       - name: Download task definition
         run: |
           aws ecs describe-task-definition --task-definition ${{ secrets.ECS_TASK_DEFINITION }} --query taskDefinition > task-definition.json
