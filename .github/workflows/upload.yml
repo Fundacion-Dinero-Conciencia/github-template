@@ -1,6 +1,10 @@
 name: Upload Image Name
 
-on: workflow_call
+on:
+  workflow_call:
+    secrets:
+      OTHER_REPO_TOKEN:
+        required: true
 
 jobs:
   upload:
