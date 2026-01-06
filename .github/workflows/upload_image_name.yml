@@ -5,6 +5,7 @@ on:
     workflows: ["Publish Image in AWS ECR"]
     types:
       - completed
+  workflow_dispatch:
 
 jobs:
   upload:
