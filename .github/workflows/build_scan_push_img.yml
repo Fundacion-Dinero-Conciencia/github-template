@@ -1,4 +1,4 @@
-name: Publish Image in AWS ECR
+name: Publish service on AWS
 
 on:
   push:
@@ -209,9 +209,17 @@ jobs:
           cd other-repo
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Agregamos los cambios al área de preparación (stage)
           git add aws-org-belat/environments/cuenta-pro/task.auto.tfvars
-          git commit -m "Update image name in task.auto.tfvars from build workflow"
-          git push
+          
+          # Revisamos si hay cambios reales para commitear
+          if git diff --cached --quiet; then
+            echo "No hay cambios detectados (la imagen ya estaba actualizada). Saltando commit."
+          else
+            git commit -m "Update image to $(cat ../image_name.txt)"
+            git push
+          fi
 
   notify:
     needs: [build]
