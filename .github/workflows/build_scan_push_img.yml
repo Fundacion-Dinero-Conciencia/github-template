@@ -194,6 +194,7 @@ jobs:
 
   update-terraform:
     runs-on: ubuntu-latest
+    needs: build
     steps:
       - name: Download artifact
         uses: actions/download-artifact@v4
@@ -230,6 +231,8 @@ jobs:
 
   notify:
     runs-on: ubuntu-latest
+    needs: [build, update-terraform]
+    if: always()
     env:
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
       GOOGLE_CHAT_WEBHOOK_URL: ${{ secrets.GOOGLE_CHAT_WEBHOOK_URL }}
