@@ -207,5 +207,4 @@ jobs:
     if: success()
     uses: ./.github/workflows/upload.yml
     with:
-          environment: ${{ inputs.environment }}
     secrets: inherit
