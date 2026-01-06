@@ -200,5 +200,4 @@ jobs:
     needs: [build]
     if: success()
     uses: ./.github/workflows/upload.yml
-    secrets:
-      OTHER_REPO_TOKEN: ${{ secrets.OTHER_REPO_TOKEN }}
+    secrets: inherit
