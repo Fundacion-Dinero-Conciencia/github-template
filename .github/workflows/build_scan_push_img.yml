@@ -37,6 +37,9 @@ on:
         required: false
       GOOGLE_CHAT_WEBHOOK_URL:
         required: false
+      OTHER_REPO_TOKEN:
+        required: false
+      
 
 jobs:
   build:
