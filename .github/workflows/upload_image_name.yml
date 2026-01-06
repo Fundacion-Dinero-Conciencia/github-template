@@ -1,11 +1,20 @@
 name: Upload Image Name to Other Repository
 
 on:
-  workflow_run:
-    workflows: ["Publish Image in AWS ECR"]
-    types:
-      - completed
-  workflow_dispatch:
+  workflow_call:
+    inputs:
+      job_status:
+        required: true
+        type: string
+    secrets:
+      OTHER_REPO_TOKEN:
+        required: false
+#on:
+#  workflow_run:
+#    workflows: ["Publish Image in AWS ECR"]
+#    types:
+#      - completed
+#  workflow_dispatch:
 
 jobs:
   upload:
