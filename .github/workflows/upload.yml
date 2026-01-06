@@ -32,6 +32,13 @@ jobs:
           cd other-repo
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          
           git add aws-org-belat/environments/cuenta-pro/task.auto.tfvars
-          git commit -m "Update image name in task.auto.tfvars from build workflow"
-          git push
+          
+          # Verificamos si hay cambios en el staging area antes de hacer el commit
+          if git diff --cached --quiet; then
+            echo "No hay cambios detectados en task.auto.tfvars. Saltando commit."
+          else
+            git commit -m "Update image to $(cat ../image_name.txt)"
+            git push
+          fi
