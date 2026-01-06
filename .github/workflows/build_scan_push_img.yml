@@ -60,6 +60,12 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Checkout other repository
+        uses: actions/checkout@v4
+        with:
+          repository: Fundacion-Dinero-Conciencia/infra-live
+          token: ${{ secrets.OTHER_REPO_TOKEN }} # <--- Aquí se usa
+          path: infra-live
 
       - name: Install wkhtmltopdf
         run: |
