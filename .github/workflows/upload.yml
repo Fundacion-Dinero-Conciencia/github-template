@@ -1,42 +1,24 @@
-name: Upload Image Name to Other Repository
+name: Upload Image Name
 
-on:
-  workflow_call:
-    inputs:
-      job_status:
-        required: true
-        type: string
-    secrets:
-      OTHER_REPO_TOKEN:
-        required: false
-#on:
-#  workflow_run:
-#    workflows: ["Publish Image in AWS ECR"]
-#    types:
-#      - completed
-#  workflow_dispatch:
+on: workflow_call
 
 jobs:
   upload:
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
           name: image-name
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          repository: ${{ github.repository }}
-          run-id: ${{ github.event.workflow_run.id }}
 
       - name: Checkout other repository
         uses: actions/checkout@v4
         with:
           repository: Fundacion-Dinero-Conciencia/infra-live
-          token: ${{ secrets.OTHER_REPO_TOKEN }}  # Necesitas crear este secret con un PAT que tenga permisos para push
+          token: ${{ secrets.OTHER_REPO_TOKEN }}
           path: other-repo
 
-      - name: Copy image name file
+      - name: Update image name in task.auto.tfvars
         run: |
           IMAGE_NAME=$(cat image_name.txt)
           sed -i 's|image = ".*"|image = "'"$IMAGE_NAME"'"|' other-repo/aws-org-belat/environments/cuenta-pro/task.auto.tfvars
