@@ -1,5 +1,16 @@
 # AWS ECR Build, Scan, Push & Deploy Workflow
 
+## Tabla de Contenidos
+
+- [Características](#-características)
+- [Requisitos Previos](#-requisitos-previos)
+- [Uso](#️-uso)
+- [Workflow de Actualización de Imagen en Otro Repositorio](#-workflow-de-actualización-de-imagen-en-otro-repositorio)
+- [Workflow de Notificaciones](#-workflow-de-notificaciones)
+- [Diagrama del Flujo](#-diagrama-del-flujo)
+- [Contribuyendo](#-contribuyendo)
+- [Licencia](#-licencia)
+
 Este repositorio contiene un flujo de trabajo reutilizable de GitHub Actions (`.github/workflows/build_scan_push_img.yml`) diseñado para construir, escanear y desplegar imágenes Docker en AWS.
 
 ## 🚀 Características
@@ -64,7 +75,7 @@ jobs:
 
 ## � Workflow de Actualización de Imagen en Otro Repositorio
 
-Este repositorio también incluye un workflow adicional (`.github/workflows/upload_image_name.yml`) que se activa automáticamente después de que el workflow principal termine exitosamente. Este workflow actualiza el archivo `task.auto.tfvars` en el repositorio `Fundacion-Dinero-Conciencia/infra-live` con el nombre de la nueva imagen Docker construida.
+Este repositorio también incluye un workflow adicional (`.github/workflows/upload.yml`) que se activa automáticamente después de que el workflow principal termine exitosamente. Este workflow actualiza el archivo `task.auto.tfvars` en el repositorio `Fundacion-Dinero-Conciencia/infra-live` con el nombre de la nueva imagen Docker construida.
 
 ### Funcionalidad
 - Descarga el artifact con el nombre de la imagen del workflow principal.
@@ -87,8 +98,20 @@ Para que este workflow funcione, necesitas:
 3. **Asegurar que el archivo exista**: El archivo `aws-org-belat/environments/cuenta-pro/task.auto.tfvars` debe existir en el repositorio `Fundacion-Dinero-Conciencia/infra-live` y contener una línea como `image = "valor-actual"`.
 
 ### Notas
-- Este workflow solo se ejecuta si el workflow principal (`Publish Image in AWS ECR`) termina con éxito.
+- Este workflow solo se ejecuta si el workflow principal (`Publish service on AWS`) termina con éxito.
 - Si hay errores (por ejemplo, archivo no encontrado o permisos insuficientes), revisa los logs del workflow.
+
+## 📢 Workflow de Notificaciones
+
+Este repositorio incluye un workflow adicional (`.github/workflows/notifications.yml`) que se utiliza para enviar notificaciones sobre el estado de los workflows a Slack y Google Chat.
+
+### Funcionalidad
+- Envía notificaciones a Slack si se configura `SLACK_WEBHOOK_URL`.
+- Envía notificaciones a Google Chat si se configura `GOOGLE_CHAT_WEBHOOK_URL`.
+- El mensaje incluye el estado del job, el nombre del workflow y el repositorio.
+
+### Uso
+Este workflow se invoca desde otros workflows usando `workflow_call` con el input `job_status`.
 
 ## �🔄 Diagrama del Flujo
 
@@ -110,3 +133,11 @@ graph TD
     style End fill:#f9f,stroke:#333,stroke-width:2px
     style Fail fill:#f96,stroke:#333,stroke-width:2px
 ```
+
+## 🤝 Contribuyendo
+
+¡Las contribuciones son bienvenidas! Por favor, lee las [guías de contribución](CONTRIBUTING.md) antes de enviar un pull request.
+
+## 📄 Licencia
+
+Este proyecto está bajo la Licencia MIT. Consulta el archivo `LICENSE` para más detalles.
