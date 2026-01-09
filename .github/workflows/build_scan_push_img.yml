@@ -284,5 +284,5 @@ jobs:
               -F "metadata={\"name\": \"$(basename $file)\"};type=application/json" \
               -F "file=@$file;type=application/pdf" \
               ${{ secrets.GOOGLE_CHAT_WEBHOOK_URL }}
-          don
+          done
 
