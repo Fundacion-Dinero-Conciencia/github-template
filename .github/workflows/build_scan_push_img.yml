@@ -140,7 +140,12 @@ jobs:
 
       - name: Convert to PDF
         if: always()
-        run: wkhtmltopdf trivy-image-report.html trivy-image-report.pdf || true
+        run: |
+          if [ -f trivy-image-report.html ]; then
+            wkhtmltopdf trivy-image-report.html trivy-image-report.pdf
+          else
+            echo "No Trivy report generated" > trivy-image-report.pdf
+          fi
 
       - name: Push image
         run: docker push ${{ steps.build.outputs.image }}
