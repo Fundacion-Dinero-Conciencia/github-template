@@ -212,7 +212,20 @@ jobs:
       - name: Update image name in task.auto.tfvars
         run: |
           IMAGE_NAME=$(cat image_name.txt)
-          sed -i -E 's|^image[[:space:]]*=[[:space:]]*".*"|image = "'"$IMAGE_NAME"'"|' other-repo/aws-org-belat/environments/cuenta-pro/task.auto.tfvars
+          SERVICE_NAME="${{ secrets.CONTAINER_NAME }}"
+
+          echo "Updating image for container: $SERVICE_NAME"
+    
+          awk -v image="$IMAGE_NAME" -v service="$SERVICE_NAME" '
+            $0 ~ "name[[:space:]]*=[[:space:]]*\""service"\"" {in_block=1}
+            in_block && $0 ~ /image[[:space:]]*=/ {
+                  sub(/image[[:space:]]*=[[:space:]]*".*"/, "image = \"" image "\"")
+                  in_block=0
+             }
+            {print}
+            ' other-repo/aws-org-belat/environments/cuenta-pro/task.auto.tfvars > tmp.tfvars
+
+            mv tmp.tfvars other-repo/aws-org-belat/environments/cuenta-pro/task.auto.tfvars
 
       - name: Show updated file
         run: |
