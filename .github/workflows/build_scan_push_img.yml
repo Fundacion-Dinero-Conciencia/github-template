@@ -201,6 +201,14 @@ jobs:
         with:
           name: image-name
 
+      - name: Debug OTHER_REPO_TOKEN
+        run: |
+          if [ -n "${{ secrets.OTHER_REPO_TOKEN }}" ]; then
+          echo "OTHER_REPO_TOKEN is PRESENT"
+          else
+          echo "OTHER_REPO_TOKEN is EMPTY"
+          fi
+
       - name: Checkout other repository
         uses: actions/checkout@v4
         with:
