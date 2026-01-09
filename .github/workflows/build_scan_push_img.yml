@@ -153,6 +153,9 @@ jobs:
           else
             echo "No Trivy report generated" > trivy-image-report.pdf
           fi
+          
+      - name: Refresh ECR Login
+        uses: aws-actions/amazon-ecr-login@v2
 
       - name: Push image
         run: docker push ${{ steps.build.outputs.image }}
