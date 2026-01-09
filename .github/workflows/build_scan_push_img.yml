@@ -209,15 +209,14 @@ jobs:
           token: ${{ secrets.OTHER_REPO_TOKEN }}
           path: other-repo
 
-      - name: Show updated file
-        run: |
-          grep '^image' other-repo/aws-org-belat/environments/cuenta-pro/task.auto.tfvars
-
-
       - name: Update image name in task.auto.tfvars
         run: |
           IMAGE_NAME=$(cat image_name.txt)
-          sed -i 's|image = ".*"|image = "'"$IMAGE_NAME"'"|' other-repo/aws-org-belat/environments/cuenta-pro/task.auto.tfvars
+          sed -i -E 's|^image[[:space:]]*=[[:space:]]*".*"|image = "'"$IMAGE_NAME"'"|' other-repo/aws-org-belat/environments/cuenta-pro/task.auto.tfvars
+
+      - name: Show updated file
+        run: |
+          grep '^image' other-repo/aws-org-belat/environments/cuenta-pro/task.auto.tfvars
 
       - name: Commit and push
         run: |
