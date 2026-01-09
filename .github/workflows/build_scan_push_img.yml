@@ -292,10 +292,16 @@ jobs:
           fi
 
           for file in "${files[@]}"; do
-            echo "Uploading $file to Google Chat"
-            curl -X POST -H "Content-Type: multipart/form-data" \
-              -F "metadata={\"name\": \"$(basename "$file")\"};type=application/json" \
-              -F "file=@$file;type=application/pdf" \
+            echo "Sending $file to Google Chat"
+
+            curl -X POST -H "Content-Type: application/json" \
+              --data "{
+                \"text\": \"📄 Trivy security report: $(basename "$file")\"
+              }" \
+              ${{ secrets.GOOGLE_CHAT_WEBHOOK_URL }}
+
+            curl -X POST -H \"Content-Type: multipart/form-data\" \
+              -F \"file=@$file;type=application/pdf\" \
               ${{ secrets.GOOGLE_CHAT_WEBHOOK_URL }}
           done
 
