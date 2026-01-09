@@ -227,10 +227,6 @@ jobs:
 
             mv tmp.tfvars other-repo/aws-org-belat/environments/cuenta-pro/task.auto.tfvars
 
-      - name: Show updated file
-        run: |
-          grep '^image' other-repo/aws-org-belat/environments/cuenta-pro/task.auto.tfvars
-
       - name: Commit and push
         run: |
           cd other-repo
