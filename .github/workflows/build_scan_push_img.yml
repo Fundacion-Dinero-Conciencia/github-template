@@ -181,7 +181,7 @@ jobs:
           name: image-artifacts
           
       - name: Load image
-        id: image
+        id: image-artifacts
         run: echo "image=$(cat image.txt)" >> $GITHUB_OUTPUT
 
       - name: Fill in the new image ID in the Amazon ECS task definition
