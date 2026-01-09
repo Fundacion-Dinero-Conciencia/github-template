@@ -1,4 +1,4 @@
-name: Upload Image Name
+name: Upload Image Name on Repo Terraform
 
 on:
   workflow_call:
