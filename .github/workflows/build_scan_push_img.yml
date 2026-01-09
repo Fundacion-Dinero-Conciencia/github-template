@@ -275,11 +275,14 @@ jobs:
       - name: Upload Trivy PDFs to Google Chat
         if: ${{ env.GOOGLE_CHAT_WEBHOOK_URL != '' }}
         run: |
-          for file in *.pdf; do
+          ls -l
+          ls -l trivy-reports || true
+
+          for file in trivy-reports/*.pdf; do
             echo "Uploading $file to Google Chat"
             curl -X POST -H "Content-Type: multipart/form-data" \
-              -F "metadata={\"name\": \"$file\"};type=application/json" \
+              -F "metadata={\"name\": \"$(basename $file)\"};type=application/json" \
               -F "file=@$file;type=application/pdf" \
               ${{ secrets.GOOGLE_CHAT_WEBHOOK_URL }}
-          done
+          don
 
