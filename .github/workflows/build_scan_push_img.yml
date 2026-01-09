@@ -99,6 +99,12 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install wkhtmltopdf
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wkhtmltopdf
+          curl -sLO https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/html.tpl
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
