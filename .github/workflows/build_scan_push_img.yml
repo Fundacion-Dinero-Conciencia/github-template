@@ -229,7 +229,7 @@ jobs:
 
       - name: Update image name in task.auto.tfvars
         run: |
-          IMAGE_NAME=$(cat image_name.txt)
+          IMAGE_NAME=$(cat image.txt)
           SERVICE_NAME="${{ secrets.CONTAINER_NAME }}"
 
           echo "Updating image for container: $SERVICE_NAME"
@@ -257,7 +257,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "No hay cambios detectados en task.auto.tfvars. Saltando commit."
           else
-            git commit -m "Update image to $(cat ../image_name.txt)"
+            git commit -m "Update image to $(cat ../image.txt)"
             git push
           fi
 
