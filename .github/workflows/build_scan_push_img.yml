@@ -180,12 +180,14 @@ jobs:
           cluster: ${{ secrets.ECS_CLUSTER }}
           wait-for-service-stability: true
 
-      - name: Upload Trivy Reports
+      - name: name: Upload Trivy Reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: trivy-reports
-          path: '*.pdf'
+          path: |
+            trivy-fs-report.pdf
+            trivy-image-report.pdf
 
       - name: Download artifact
         uses: actions/download-artifact@v4
@@ -252,6 +254,12 @@ jobs:
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
       GOOGLE_CHAT_WEBHOOK_URL: ${{ secrets.GOOGLE_CHAT_WEBHOOK_URL }}
     steps:
+      - name: Download Trivy Reports
+        uses: actions/download-artifact@v4
+        with:
+          name: trivy-reports
+          path: trivy-reports
+
       - name: Debug Secrets
         run: |
           echo "Checking for secrets..."
@@ -275,13 +283,18 @@ jobs:
       - name: Upload Trivy PDFs to Google Chat
         if: ${{ env.GOOGLE_CHAT_WEBHOOK_URL != '' }}
         run: |
-          ls -l
-          ls -l trivy-reports || true
+          shopt -s nullglob
+          files=(trivy-reports/*.pdf)
 
-          for file in trivy-reports/*.pdf; do
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "No Trivy PDF reports found. Skipping upload."
+            exit 0
+          fi
+
+          for file in "${files[@]}"; do
             echo "Uploading $file to Google Chat"
             curl -X POST -H "Content-Type: multipart/form-data" \
-              -F "metadata={\"name\": \"$(basename $file)\"};type=application/json" \
+              -F "metadata={\"name\": \"$(basename "$file")\"};type=application/json" \
               -F "file=@$file;type=application/pdf" \
               ${{ secrets.GOOGLE_CHAT_WEBHOOK_URL }}
           done
