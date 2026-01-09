@@ -117,6 +117,16 @@ jobs:
           TAG="${GITHUB_RUN_NUMBER}"
           docker build -t $IMAGE_URI:$TAG .
           echo "image=$IMAGE_URI:$TAG" >> $GITHUB_OUTPUT
+      
+      - name: Save image name
+        run: |
+          echo "${{ steps.build.outputs.image }}" > image.txt
+
+      - name: Upload image name
+        uses: actions/upload-artifact@v4
+        with:
+          name: image-name
+          path: image.txt
 
       - name: Trivy Image Scan
         uses: aquasecurity/trivy-action@master
@@ -139,7 +149,7 @@ jobs:
         with:
           name: image-artifacts
           path: |
-            trivy-image-report.pd
+            trivy-image-report.pdf
 
   deploy-ecs:
     runs-on: ubuntu-latest
@@ -160,6 +170,10 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           name: image-name  
+      
+      - name: Load image
+        id: image
+        run: echo "image=$(cat image.txt)" >> $GITHUB_OUTPUT
 
       - name: Download artifact
         uses: actions/download-artifact@v4
