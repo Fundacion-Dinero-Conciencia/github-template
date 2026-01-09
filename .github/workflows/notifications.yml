@@ -15,7 +15,6 @@ on:
 jobs:
   notify:
     runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}
     env:
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
       GOOGLE_CHAT_WEBHOOK_URL: ${{ secrets.GOOGLE_CHAT_WEBHOOK_URL }}
