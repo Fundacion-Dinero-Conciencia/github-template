@@ -180,7 +180,7 @@ jobs:
           cluster: ${{ secrets.ECS_CLUSTER }}
           wait-for-service-stability: true
 
-      - name: name: Upload Trivy Reports
+      - name: Upload Trivy Reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
