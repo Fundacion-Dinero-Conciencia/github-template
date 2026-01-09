@@ -139,12 +139,14 @@ jobs:
           severity: 'CRITICAL,HIGH'
 
       - name: Convert to PDF
+        if: always()
         run: wkhtmltopdf trivy-image-report.html trivy-image-report.pdf || true
 
       - name: Push image
         run: docker push ${{ steps.build.outputs.image }}
       
       - name: Upload image + report
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: image-artifacts
@@ -179,10 +181,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: image-artifacts
-          
-      - name: Load image
-        id: image-artifacts
-        run: echo "image=$(cat image.txt)" >> $GITHUB_OUTPUT
 
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: task-def
