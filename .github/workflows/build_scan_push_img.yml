@@ -202,20 +202,17 @@ jobs:
         with:
           name: image-name
 
-      - name: Debug OTHER_REPO_TOKEN
-        run: |
-          if [ -n "${{ secrets.OTHER_REPO_TOKEN }}" ]; then
-          echo "OTHER_REPO_TOKEN is PRESENT"
-          else
-          echo "OTHER_REPO_TOKEN is EMPTY"
-          fi
-
       - name: Checkout other repository
         uses: actions/checkout@v4
         with:
           repository: Fundacion-Dinero-Conciencia/infra-live
           token: ${{ secrets.OTHER_REPO_TOKEN }}
           path: other-repo
+
+      - name: Show updated file
+        run: |
+          grep '^image' other-repo/aws-org-belat/environments/cuenta-pro/task.auto.tfvars
+
 
       - name: Update image name in task.auto.tfvars
         run: |
@@ -257,7 +254,7 @@ jobs:
         run: |
           STATUS="${{ needs.build.result }}"
           curl -X POST -H 'Content-type: application/json' \
-          --data '{"text": "GITHUB ACTION STATUS: '"$STATUS"' - Workflow: ${{ github.workflow }} - Repo: ${{ github.repository }}"}' \
+          --data '{"text": "GITHUB ACTION STATUS: '"$STATUS"' - Workflow: ${{ github.workflow }} - Repositorio: ${{ github.repository }}"}' \
           ${{ secrets.SLACK_WEBHOOK_URL }}
 
       - name: Send Google Chat Notification
@@ -265,6 +262,6 @@ jobs:
         run: |
           STATUS="${{ needs.build.result }}"
           curl -X POST -H 'Content-Type: application/json' \
-          --data '{"text": "GITHUB ACTION STATUS: '"$STATUS"' - Workflow: ${{ github.workflow }} - Repo: ${{ github.repository }}"}' \
+          --data '{"text": "GITHUB ACTION STATUS: '"$STATUS"' - Workflow: ${{ github.workflow }} - Repositorio: ${{ github.repository }}"}' \
           ${{ secrets.GOOGLE_CHAT_WEBHOOK_URL }}
 
